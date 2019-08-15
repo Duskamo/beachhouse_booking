@@ -1,0 +1,2 @@
+1565750547307	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.wHTk9Roc9b9X"
+Running Firefox as root in a regular user's session is not supported.  ($HOME is /home/dustin which is owned by dustin.)
