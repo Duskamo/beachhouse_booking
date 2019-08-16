@@ -5,21 +5,21 @@ import json
 from data.Config import Config
 from src.VRBOCalendarAutomator import VRBOCalendarAutomator
 from src.ReservationsReader import ReservationsReader
+from src.DateComparer import DateComparer
 
 app = Flask(__name__)
 
 # Data Requests
-@app.route('/get_calendar_dates', methods=['GET'])
-def get_calendar_dates():	
+@app.route('/request_calendar_dates', methods=['GET']) # Dispatched on CRON Service
+def request_calendar_dates():	
 	# Goto VRBO site calendar page and export calendar csv to data folder
-	"""
 	calendarAutomator = VRBOCalendarAutomator()
 	calendarAutomator.gotoVRBOHomePage()
 	calendarAutomator.login(Config.username,Config.password)
 	calendarAutomator.gotoVRBOCalendarPage()
 	calendarAutomator.exportCalendarCSV()
 	calendarAutomator.moveCalendarCSVToDataDirectory()
-	"""
+	
 	# Read calendar csv file and store start and end booking dates in object 
 	reservationsReader = ReservationsReader()
 	reservationsReader.readBookedDates()
@@ -28,16 +28,35 @@ def get_calendar_dates():
 	# Return booking dates json object to client (Not sending back correct dates)
 	return json.dumps(bookedDates)
 
-@app.route('/booking_index', methods=['POST'])
-def booking_index():
-	# Gather Data
+@app.route('/get_calendar_dates', methods=['GET'])
+def get_calendar_dates():	
+	# Read calendar csv file and store start and end booking dates in object 
+	reservationsReader = ReservationsReader()
+	reservationsReader.readBookedDates()
+	bookedDates = reservationsReader.getBookedDates()
+	
+	# Return booking dates json object to client (Not sending back correct dates)
+	return json.dumps(bookedDates)
+
+@app.route('/booking_availability', methods=['POST'])
+def booking_availability():
+	# Gather booking request data
 	bookingInfo = request.json
 	
-	# Check if dates are available to book
-	print(bookingInfo['startDate'])
+	# Gather booked dates
+	reservationsReader = ReservationsReader()
+	reservationsReader.readBookedDates()
+	bookedDates = reservationsReader.getBookedDates()
 
-	# Return user to booking page with dates pre-booked if available, if not then return error message to user
-	return "200"
+	# Check if dates are available to book
+	dateComparer = DateComparer(bookedDates)
+	isDateAvailable = dateComparer.isDateAvailable(bookingInfo)
+
+	# If dates are available return available, if not return unavailable
+	if isDateAvailable:
+		return "available"
+	else:
+		return "unavailable"
 
 
 # Run app on 0.0.0.0:5002
