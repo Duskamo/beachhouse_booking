@@ -6,6 +6,7 @@ from data.Config import Config
 from src.VRBOCalendarAutomator import VRBOCalendarAutomator
 from src.ReservationsReader import ReservationsReader
 from src.DateComparer import DateComparer
+from src.BookingDatabase import BookingDatabase
 
 app = Flask(__name__)
 
@@ -57,6 +58,19 @@ def booking_availability():
 		return "available"
 	else:
 		return "unavailable"
+
+@app.route('/save_booked_information', methods=['POST'])
+def save_booked_information():
+	# Gather booking request data
+	bookingInfo = request.json
+	
+	# Save booked dates to mysql database
+	database = BookingDatabase()
+	database.connect()
+	database.save(bookingInfo)
+
+	# If dates are available return available, if not return unavailable
+	return "200"
 
 
 # Run app on 0.0.0.0:5002
