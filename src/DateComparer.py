@@ -28,8 +28,6 @@ class DateComparer:
 		else:
 			return True
 
-
-	# Helper Methods
 	def generateDateRange(self,bookingStart,bookingEnd):
 		date_list = [bookingStart + timedelta(days=x) for x in range((bookingEnd - bookingStart).days+1)]
 		return date_list

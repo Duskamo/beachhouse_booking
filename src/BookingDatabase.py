@@ -44,3 +44,10 @@ class BookingDatabase:
 		self.mycursor.execute(sql, val)
 
 		self.mydb.commit()
+
+		# RentalInfo insert
+		sql = "INSERT INTO RentalInfo (arrivalDate, departDate, nightsCount, guestCount) VALUES (%s, %s, %s, %s);"
+		val = (bookingInfo['rentalInfo']['arrivalDate'],bookingInfo['rentalInfo']['departDate'],bookingInfo['rentalInfo']['nightsCount'],bookingInfo['rentalInfo']['guestCount'],)
+		self.mycursor.execute(sql, val)
+
+		self.mydb.commit()

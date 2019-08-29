@@ -36,3 +36,13 @@ CREATE TABLE  BillingInfo (
     zip VARCHAR(255) NOT NULL,
     PRIMARY KEY (billing_info_id)
 );
+
+DROP TABLE RentalInfo;
+CREATE TABLE  RentalInfo (
+    rental_info_id INT AUTO_INCREMENT,
+    arrivalDate VARCHAR(255) NOT NULL,
+    departDate VARCHAR(255) NOT NULL,
+    nightsCount VARCHAR(255) NOT NULL,
+    guestCount VARCHAR(255) NOT NULL,
+    PRIMARY KEY (rental_info_id)
+);

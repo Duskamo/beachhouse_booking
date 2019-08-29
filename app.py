@@ -5,6 +5,8 @@ import json
 from data.Config import Config
 from src.VRBOCalendarAutomator import VRBOCalendarAutomator
 from src.ReservationsReader import ReservationsReader
+from src.ReservationsWriter import ReservationsWriter
+from src.RatesReader import RatesReader
 from src.DateComparer import DateComparer
 from src.BookingDatabase import BookingDatabase
 
@@ -29,8 +31,8 @@ def request_calendar_dates():
 	# Return booking dates json object to client (Not sending back correct dates)
 	return json.dumps(bookedDates)
 
-@app.route('/get_calendar_dates', methods=['GET'])
-def get_calendar_dates():	
+@app.route('/get_reserved_dates', methods=['GET'])
+def get_reserved_dates():	
 	# Read calendar csv file and store start and end booking dates in object 
 	reservationsReader = ReservationsReader()
 	reservationsReader.readBookedDates()
@@ -38,6 +40,22 @@ def get_calendar_dates():
 	
 	# Return booking dates json object to client (Not sending back correct dates)
 	return json.dumps(bookedDates)
+
+@app.route('/get_rates_by_date', methods=['GET'])
+def get_rates_by_date():	
+	# Read calendar csv file and store start and end booking dates in object 
+	reservationsReader = ReservationsReader()
+	reservationsReader.readBookedDates()
+	bookedDates = reservationsReader.getBookedDates()
+
+	# Read dates and rates that are not yet booked
+	ratesReader = RatesReader()
+	ratesReader.readRates()
+	ratesReader.removeBookedDates(bookedDates)
+	bookingRates = ratesReader.getRates()
+	
+	# Return booking dates json object to client (Not sending back correct dates)
+	return json.dumps(bookingRates)
 
 @app.route('/booking_availability', methods=['POST'])
 def booking_availability():
@@ -59,8 +77,8 @@ def booking_availability():
 	else:
 		return "unavailable"
 
-@app.route('/save_booked_information', methods=['POST'])
-def save_booked_information():
+@app.route('/save_booked_information_to_database', methods=['POST'])
+def save_booked_information_to_database():
 	# Gather booking request data
 	bookingInfo = request.json
 	
@@ -70,6 +88,18 @@ def save_booked_information():
 	database.save(bookingInfo)
 
 	# If dates are available return available, if not return unavailable
+	return "200"
+
+@app.route('/save_booked_information_to_reservations', methods=['POST'])
+def save_booked_information_to_reservations():
+	# Gather booking request data
+	bookingInfo = request.json
+	
+	# Save booked dates to mysql database
+	reservationsWriter = ReservationsWriter()
+	reservationsWriter.writeBookedDates(bookingInfo)
+
+	# Return Status Code
 	return "200"
 
 
