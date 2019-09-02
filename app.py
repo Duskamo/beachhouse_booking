@@ -3,7 +3,7 @@ import os
 import json
 
 from data.Config import Config
-from src.VRBOCalendarAutomator import VRBOCalendarAutomator
+from src.VRBOAutomator import VRBOAutomator
 from src.ReservationsReader import ReservationsReader
 from src.ReservationsWriter import ReservationsWriter
 from src.RatesReader import RatesReader
@@ -16,12 +16,12 @@ app = Flask(__name__)
 @app.route('/request_calendar_dates', methods=['GET']) # Dispatched on CRON Service
 def request_calendar_dates():	
 	# Goto VRBO site calendar page and export calendar csv to data folder
-	calendarAutomator = VRBOCalendarAutomator()
-	calendarAutomator.gotoVRBOHomePage()
-	calendarAutomator.login(Config.username,Config.password)
-	calendarAutomator.gotoVRBOCalendarPage()
-	calendarAutomator.exportCalendarCSV()
-	calendarAutomator.moveCalendarCSVToDataDirectory()
+	vrboAutomator = VRBOCalendarAutomator()
+	vrboAutomator.gotoVRBOHomePage()
+	vrboAutomator.login(Config.username,Config.password)
+	vrboAutomator.gotoVRBOCalendarPage()
+	vrboAutomator.exportCalendarCSV()
+	vrboAutomator.moveCalendarCSVToDataDirectory()
 	
 	# Read calendar csv file and store start and end booking dates in object 
 	reservationsReader = ReservationsReader()
@@ -102,6 +102,20 @@ def save_booked_information_to_reservations():
 	# Return Status Code
 	return "200"
 
+@app.route('/send_booked_information_to_vrbo', methods=['POST'])
+def send_booked_information_to_vrbo():
+	# Gather booking request data
+	bookingInfo = request.json
+	
+	# Send booked dates to VRBO
+	vrboAutomator = VRBOAutomator()
+	vrboAutomator.gotoVRBOHomePage()
+	vrboAutomator.login(Config.username,Config.password)
+	vrboAutomator.gotoVRBOReservedListPage()
+	vrboAutomator.reserveBookedDates(bookingInfo)
+
+	# Return Status Code
+	return "200"
 
 # Run app on 0.0.0.0:5002
 if __name__ == "__main__":
