@@ -13,23 +13,17 @@ from src.BookingDatabase import BookingDatabase
 app = Flask(__name__)
 
 # Data Requests
-@app.route('/request_calendar_dates', methods=['GET']) # Dispatched on CRON Service
+@app.route('/request_calendar_dates', methods=['GET']) # Dispatched on CRON Service callback
 def request_calendar_dates():	
 	# Goto VRBO site calendar page and export calendar csv to data folder
-	vrboAutomator = VRBOCalendarAutomator()
+	vrboAutomator = VRBOAutomator()
 	vrboAutomator.gotoVRBOHomePage()
 	vrboAutomator.login(Config.username,Config.password)
 	vrboAutomator.gotoVRBOCalendarPage()
 	vrboAutomator.exportCalendarCSV()
 	vrboAutomator.moveCalendarCSVToDataDirectory()
 	
-	# Read calendar csv file and store start and end booking dates in object 
-	reservationsReader = ReservationsReader()
-	reservationsReader.readBookedDates()
-	bookedDates = reservationsReader.getBookedDates()
-	
-	# Return booking dates json object to client (Not sending back correct dates)
-	return json.dumps(bookedDates)
+	return "200"
 
 @app.route('/get_reserved_dates', methods=['GET'])
 def get_reserved_dates():	

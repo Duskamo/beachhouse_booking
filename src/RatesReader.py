@@ -24,8 +24,8 @@ class RatesReader:
 			
 		# Generate all date ranges and store each range in totalBookedRanges
 		for i in range(len(bookedDates)):	
-			totalBookedRanges.append(dateComparer.generateDateRange(datetime.strptime(bookedDates[i]["startDate"],"%m/%d/%Y"), datetime.strptime(bookedDates[i]["endDate"],"%m/%d/%Y")))
-		
+			totalBookedRanges.append(dateComparer.generateDateRange(datetime.strptime(bookedDates[i]["startDate"],"%Y-%m-%d"), datetime.strptime(bookedDates[i]["endDate"],"%Y-%m-%d")))		
+
 		# Store all dates in a 1-demenstional list to loop through easier when removing dates from bookingRates
 		for i in range(len(totalBookedRanges)):
 			for j in range(len(totalBookedRanges[i])):

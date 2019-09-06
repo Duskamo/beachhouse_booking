@@ -15,8 +15,8 @@ class DateComparer:
 
 		for i in range(len(self.bookedDates)):
 			for j in range(len(bookingDateRange)):
-				bookedStart = datetime.strptime(self.bookedDates[i]["startDate"],"%m/%d/%Y")
-				bookedEnd = datetime.strptime(self.bookedDates[i]["endDate"],"%m/%d/%Y")
+				bookedStart = datetime.strptime(self.bookedDates[i]["startDate"],"%Y-%m-%d")
+				bookedEnd = datetime.strptime(self.bookedDates[i]["endDate"],"%Y-%m-%d")
 
 				if (bookedStart <= bookingDateRange[j] <= bookedEnd or bookedStart <= bookingDateRange[j] <= bookedEnd):
 					isDateAvailable.append(False)
