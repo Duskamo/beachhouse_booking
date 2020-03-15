@@ -1,8 +1,10 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import os
 import json
+from datetime import datetime
 
 from data.Config import Config
+from data.StaticRates import *
 from src.VRBOAutomator import VRBOAutomator
 from src.ReservationsReader import ReservationsReader
 from src.ReservationsWriter import ReservationsWriter
@@ -51,6 +53,32 @@ def get_rates_by_date():
 	# Return booking dates json object to client (Not sending back correct dates)
 	return json.dumps(bookingRates)
 
+@app.route('/get_nightly_rates_by_booked_date', methods=['GET'])
+def get_calendar_info():
+	# Gather booking request data
+	bookingInfo = request.json
+
+	# Convert dates to proper format
+	bookedDates = [datetime.strptime(bookingInfo['startDate'],"%m/%d/%Y").strftime("%Y-%m-%d"),datetime.strptime(bookingInfo['endDate'],"%m/%d/%Y").strftime("%Y-%m-%d")]
+
+	# Get daily rates by date
+	ratesReader = RatesReader()
+	ratesReader.readRates()
+	nightlyRateTotal = ratesReader.getRatesByRequestedDates(bookedDates)
+
+	# Process nightly Rates
+	rates = {
+		"nightlyRate" : str(nightlyRateTotal),
+		"cleaningRate" : cleaningRate,
+		"serviceRate" : serviceRate,
+		"lodgingRate" : lodgingRate
+	}
+
+	print(rates)
+
+	# Return booked rates to wizard for processing
+	return jsonify(rates)
+
 @app.route('/booking_availability', methods=['POST'])
 def booking_availability():
 	# Gather booking request data
@@ -65,8 +93,14 @@ def booking_availability():
 	dateComparer = DateComparer(bookedDates)
 	isDateAvailable = dateComparer.isDateAvailable(bookingInfo)
 
+	# Check if dates are current and not in the past
+	isDateCurrent = dateComparer.isDateCurrent(bookingInfo)
+
+	# Check if start date is before end date
+	areDatesInOrder = dateComparer.areDatesInOrder(bookingInfo)
+
 	# If dates are available return available, if not return unavailable
-	if isDateAvailable:
+	if isDateAvailable and isDateCurrent and areDatesInOrder:
 		return "available"
 	else:
 		return "unavailable"

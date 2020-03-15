@@ -39,3 +39,33 @@ class RatesReader:
 		
 	def getRates(self):
 		return self.bookingRates
+
+	def getRatesByRequestedDates(self, bookedDates):
+		# Get all dates in a list
+		dateComparer = DateComparer(bookedDates)
+		generatedDates = dateComparer.generateDateRange(datetime.strptime(bookedDates[0],"%Y-%m-%d"), datetime.strptime(bookedDates[1],"%Y-%m-%d"))
+		del generatedDates[-1]
+
+		# Convert to stored rates format
+		convertedDates = []
+
+		for i in range(len(generatedDates)):
+			convertedDates.append(generatedDates[i].strftime("%m/%d/%Y")[:-2])
+		
+		# Get all stored rates from rates file using generated dates
+		generatedRates = []
+
+		for i in range(len(convertedDates)):
+			for j in range(len(self.bookingRates)):
+				if (convertedDates[i] == self.bookingRates[j]['date']):
+					generatedRates.append(self.bookingRates[j]['rate'])
+		
+		# Add stored rates together and return total nightly rates
+		totalRateByRequestedDate = 0
+
+		for i in range(len(generatedRates)):
+			totalRateByRequestedDate += int(generatedRates[i])
+
+		return totalRateByRequestedDate
+
+

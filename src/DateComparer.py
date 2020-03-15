@@ -31,3 +31,16 @@ class DateComparer:
 	def generateDateRange(self,bookingStart,bookingEnd):
 		date_list = [bookingStart + timedelta(days=x) for x in range((bookingEnd - bookingStart).days+1)]
 		return date_list
+
+	
+	def isDateCurrent(self, bookingRequest):
+		presentDate = datetime.now()
+		startDate = datetime.strptime(bookingRequest["startDate"],"%m/%d/%Y")
+
+		return startDate >= presentDate 
+
+	def areDatesInOrder(self, bookingRequest):
+		startDate = datetime.strptime(bookingRequest["startDate"],"%m/%d/%Y")
+		endDate = datetime.strptime(bookingRequest["endDate"],"%m/%d/%Y")
+
+		return startDate < endDate 
