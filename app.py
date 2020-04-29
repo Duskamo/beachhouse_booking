@@ -69,9 +69,7 @@ def get_calendar_info():
 	# Process nightly Rates
 	rates = {
 		"nightlyRate" : str(nightlyRateTotal),
-		"cleaningRate" : cleaningRate,
-		"serviceRate" : serviceRate,
-		"lodgingRate" : lodgingRate
+		"cleaningRate" : cleaningRate
 	}
 
 	print(rates)
