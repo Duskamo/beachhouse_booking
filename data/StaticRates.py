@@ -1,3 +1,3 @@
 
-cleaningRate = "100.00"
+cleaningRate = "125.00"
 
